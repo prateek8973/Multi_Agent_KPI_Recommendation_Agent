@@ -232,6 +232,36 @@ export default function App() {
           {loading ? "Running agents… please wait." : "Run Crew AI Agents"}
         </button>
       </section>
+    {/* ===================== DATASET PREVIEW ===================== */}
+{result?.preview && result.preview.length > 0 && (
+  <div className="card">
+    <h2>Dataset Preview (First 5 Rows)</h2>
+
+    <div className="table-wrapper">
+      <table className="data-table">
+        <thead>
+          <tr>
+            {Object.keys(result.preview[0]).map((col) => (
+              <th key={col}>{col}</th>
+            ))}
+          </tr>
+        </thead>
+
+        <tbody>
+          {result.preview.map((row, rowIdx) => (
+            <tr key={rowIdx}>
+              {Object.values(row).map((val, colIdx) => (
+                <td key={colIdx}>
+                  {val !== null && val !== undefined ? val.toString() : "—"}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
 
       {/* ===================== RESULTS SECTION ===================== */}
       {result && (

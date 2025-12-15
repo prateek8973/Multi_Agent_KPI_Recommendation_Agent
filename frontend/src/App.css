@@ -292,3 +292,26 @@ canvas {
   box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
   outline: none;
 }
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.data-table th {
+  background: #f9fafb;
+  font-weight: 600;
+}

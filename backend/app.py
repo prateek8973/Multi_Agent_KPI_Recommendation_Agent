@@ -544,6 +544,7 @@ async def orchestrate(goal_text: str = Form(...), file: UploadFile = File(...)):
         if not csv_bytes:
             raise HTTPException(status_code=400, detail="Empty file uploaded")
         df = pd.read_csv(pd.io.common.BytesIO(csv_bytes))
+        preview_rows = df.head(5).to_dict(orient="records")
         loop = asyncio.get_event_loop()
         crew_result = await loop.run_in_executor(executor, run_crew_sync, csv_bytes, goal_text)
         if not crew_result.get('success'):
@@ -618,7 +619,8 @@ async def orchestrate(goal_text: str = Form(...), file: UploadFile = File(...)):
             data_quality=data_quality,
             impact_map=impact_map,
             trace=[TraceStep(**t) for t in parsed.get('trace', [])],
-            metadata=metadata
+            metadata=metadata,
+            preview=preview_rows
         )
         return response
 
