@@ -103,6 +103,8 @@ class OrchestrateResponse(BaseModel):
     impact_map: Optional[List[ImpactItem]] = None
     trace: Optional[List[TraceStep]] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
+    preview: Optional[List[Dict[str, Any]]] = None
+    crew_final_answer: Optional[str] = None
 
 class FeedbackRequest(BaseModel):
     kpi_name: Optional[str] = None
@@ -354,15 +356,24 @@ def get_embeddings(texts):
         vectors.append(v)
     return vectors
 
+import numpy as np
+
 def cosine_sim_from_vectors(a, b):
-    """Cosine similarity between 1D vectors (lists or numpy arrays)."""
-    if not a or not b:
+    if a is None or b is None:
         return 0.0
-    # NumPy not required; implement dot/L2
-    dot = sum(x*y for x,y in zip(a,b))
-    norm_a = math.sqrt(sum(x*x for x in a)) or 1.0
-    norm_b = math.sqrt(sum(x*x for x in b)) or 1.0
-    return float(dot / (norm_a * norm_b))
+
+    a = np.asarray(a)
+    b = np.asarray(b)
+
+    if a.size == 0 or b.size == 0:
+        return 0.0
+
+    denom = (np.linalg.norm(a) * np.linalg.norm(b))
+    if denom == 0:
+        return 0.0
+
+    return float(np.dot(a, b) / denom)
+
 
 # If sklearn available, prefer using its pairwise cosine for speed/robustness
 def pairwise_cosine_matrix(vectors):
@@ -620,7 +631,8 @@ async def orchestrate(goal_text: str = Form(...), file: UploadFile = File(...)):
             impact_map=impact_map,
             trace=[TraceStep(**t) for t in parsed.get('trace', [])],
             metadata=metadata,
-            preview=preview_rows
+            preview=preview_rows,
+            crew_final_answer=crew_result['result']
         )
         return response
 
