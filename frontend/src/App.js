@@ -286,34 +286,21 @@ export default function App() {
 {/* Computed KPIs */}
 <h3 className="section-title">Computed KPIs</h3>
 
-{result?.metadata?.computed_kpis &&
- result.metadata.computed_kpis.length > 0 ? (
+{result.computed && Object.keys(result.computed).length > 0 ? (
   <div className="kpi-list">
-    {result.metadata.computed_kpis.map((kpi, index) => (
+    {Object.entries(result.computed).map(([name, value], index) => (
       <div key={index} className="kpi-card">
-        <h4>{kpi.name}</h4>
-
-        {kpi.value !== undefined && (
-          <p className="kpi-value">
-            <strong>Value:</strong> {kpi.value}
-          </p>
-        )}
-
-        {kpi.formula && (
-          <p className="kpi-formula">
-            <strong>Formula:</strong> {kpi.formula}
-          </p>
-        )}
-
-        {kpi.description && (
-          <p className="kpi-desc">{kpi.description}</p>
-        )}
+        <h4>{name}</h4>
+        <p className="kpi-value">
+          <strong>Value:</strong> {value}
+        </p>
       </div>
     ))}
   </div>
 ) : (
   <p>No computed KPIs returned.</p>
 )}
+
 
   {/* ===================== KPI EVALUATION METRICS ===================== */}
   {result?.metadata?.evaluation && (
@@ -400,30 +387,7 @@ export default function App() {
     </div>
   )}
 
-  {/* ===================== CSV PREVIEW ===================== */}
-  {result?.preview && (
-    <div className="card">
-      <h2>CSV Preview</h2>
-      <table className="csv-table">
-        <thead>
-          <tr>
-            {Object.keys(result.preview[0] || {}).map((col) => (
-              <th key={col}>{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {result.preview.map((row, idx) => (
-            <tr key={idx}>
-              {Object.values(row).map((value, i) => (
-                <td key={i}>{String(value)}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )}
+  
 
 {/* ===================== KPI RECOMMENDATIONS ===================== */}
 {result.recommendations && result.recommendations.length > 0 && (
@@ -473,7 +437,7 @@ export default function App() {
     <h2>Insights</h2>
 
     {result.insights.map((ins, idx) => (
-      <div key={idx} className={`insight-item ${ins.severity}`}>
+      <div key={idx} className={`insight-item ${ins.severity || "info"||"warning"}`}>
         <h3>{ins.title}</h3>
         <p>{ins.description}</p>
         <p><b>Recommendation:</b> {ins.recommendation}</p>
@@ -481,6 +445,9 @@ export default function App() {
     ))}
   </div>
 )}
+ <pre className="crew-output">
+  {result.crew_final_answer}
+</pre>
 
   {/* ===================== DATA QUALITY SECTION ===================== */}
   {quality && (
@@ -492,6 +459,8 @@ export default function App() {
       <p><b>Outliers Detected:</b> {quality.outliers}</p>
     </div>
   )}
+ 
+
 </>
 
         </section>
@@ -499,3 +468,4 @@ export default function App() {
     </div>
   );
 }
+
